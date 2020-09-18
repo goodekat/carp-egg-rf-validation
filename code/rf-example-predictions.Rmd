@@ -1,0 +1,208 @@
+---
+title: "Code for Applying Augmented Models to New Data"
+date: 'Last Updated: `r format(Sys.time(), "%B %d, %Y")`'
+output:
+  pdf_document:
+    number_sec: yes
+    toc: yes
+    highlight: haddock
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\vspace{0.5cm}
+
+This document accompanies the paper "Evaluation of a Random Forest Model to Identify Invasive Carp Eggs Based on Morphometric Features". It contains code for accessing the augmented models with invasive carp treated as one species. Users can use the function `carp_rf_predict` to input a set of their own morphometric variable values to obtain predictions from the models.
+
+\vspace{0.5cm}
+
+# Augmented Random Forest Models
+
+The code below loads the augmented random forest models (fit using data from 2014-2016), which are stored in the RDS object `rfs141516.rds` as a list. The four models where Bighead, Grass, and Silver Carp are treated as a single classification category (at the levels of species, family, and genus) are extracted and stored as separate objects. Note that ACGC is the category name for invasive carp.
+
+\vspace{0.5cm}
+
+```{r}
+# Load the augmented random forest models
+rfs141516 <- readRDS("../results/rfs141516.rds")
+
+# Extract and separate the four models where invasive carp 
+# is one classification category
+rf_species <- rfs141516$Common_Name_ACGC
+rf_species_reduced <- rfs141516$Common_Name_ACGC_reduced
+rf_genus <- rfs141516$Genus_ACGC
+rf_family <- rfs141516$Family_ACGC
+```
+
+# Structure of the Morphometric Variable Data Frame
+
+In order to be able to use one of the random forest models for prediction, the new data must contain the morphometric predictor variables listed in the table below where each column in the data frame contains the entries for one of the variables. The variable names must be the same as those listed below (case sensitive), and the variable types also must be the same. If the objective is to use the random forest `rf_species_reduced`, then only the variables of `Membrane_Ave`, `Yolk_Ave`, `Deflated`, `Membrane_SD`, `Temperature`, `Pigment`, `Julian_Day`, `Yolk_to_Membrane_Ratio`, `Membrane_CV`, `Conductivity`, and `Yolk_SD` are needed.
+
+| Variable | Type | Description |
+| -------- | --- | --------------- |
+| `Month` | `int` | month when the egg was collected (specified as an integer where January is 1 and December is 12) |
+| `Julian_Day` | `int` | Julian day on which the egg was collected |
+| `Temperature` | `num` | temperature (C) of the water during the time of collection | `Conductivity` | conductivity ($\mu$S) of the water during the time of collection
+| `Larval_Length` | `num` | late stage embryo midline length (mm)
+| `Membrane_Ave` | `num` | average membrane diameter (mm)
+| `Membrane_SD` | `num` | membrane diameter standard deviation (mm)
+| `Membrane_CV` | `num` | membrane diameter coefficient of variation (mm)
+| `Yolk_to_Membrane_Ratio` | `num` | perivitelline space index
+| `Yolk_Ave` | `num` | average embryo diameter (mm)
+| `Yolk_SD` | `num` | embryo diameter standard deviation (mm)
+| `Yolk_CV` | `num` | embryo diameter coefficient of variation (mm)
+| `Egg_Stage` | `Factor` | development stage of the egg (1, 2, 3, 4, 5, 6, 7, 8, BROKEN, or D)
+| `Compact_Diffuse` | `Factor` | indicates whether the egg was compact or diffuse (C or D)
+| `Pigment` | `Factor` | indicates whether the egg had pigment or not (Y or N)
+| `Sticky_Debris` | `Factor` | indicates whether the egg had debris on it or not (Y or N)
+| `Deflated` | `Factor` | indicates whether the egg was deflated or not (Y or N)
+
+An example of such a data frame is created below, and the structure is printed.
+
+\vspace{0.5cm}
+
+```{r}
+# Create an example data frame
+example_vars <-
+  data.frame(
+    Month = as.integer(c(4, 5)),
+    Julian_Day = as.integer(c(120, 131)),
+    Temperature = c(16, 16.8),
+    Conductivity = c(435, 367),
+    Larval_Length = c(0, 0),
+    Membrane_Ave = c(1.39305, 1.31183),
+    Membrane_SD = c(0.12109, 0.18596),
+    Membrane_CV = c(0.08692, 0.14176),
+    Yolk_to_Membrane_Ratio = c(0.57986, 0.14176),
+    Yolk_Ave = c(0.80777, 1.06952),
+    Yolk_SD = c(0.1685, 0.1955),
+    Yolk_CV = c(0.2086, 0.1828),
+    Egg_Stage = factor(c(1, 4)),
+    Compact_Diffuse = factor(c("C", "C")),
+    Pigment = factor(c("Y", "Y")),
+    Sticky_Debris = factor(c("N", "N")),
+    Deflated = factor(c("N", "N"))
+  )
+
+# Print the structure of the data frame
+str(example_vars)
+```
+
+# Factor Levels
+
+In order to be able to use one of the random forest models to make predictions, the factor variables in the data frame must have matching levels as those used to train the model. The function below adjusts the factor levels in the data frame to match those of the data used to train the model. If a level is in one of the factors in the new data that was not in the training data, an error will be returned.
+
+\vspace{0.5cm}
+
+```{r}
+# Function for adjusting the factor levels of the data frame with the 
+# morphometric variables as needed
+adjust_factor_levels <- function(df) {
+  
+  # Create factors with levels
+  es_levels = c("1", "2", "3", "4", "5", "6", "7", "8", "BROKEN", "D")
+  cd_levels = c("C", "D")
+  yn_levels = c("N", "Y")
+  
+  # Check if the levels are correct and change if not (stop if a 
+  # level that is not in the training data is found)
+  if (sum(levels(df$Egg_Stage) != es_levels) > 0) {
+    if (!(sum(levels(df$Egg_Stage) %in% es_levels))) {
+      stop ("Level in Egg_Stage that is not in training data.")
+    }
+    df$Egg_Stage <- factor(df$Egg_Stage,levels = es_levels)
+  }
+  if (sum(levels(df$Compact_Diffuse) != cd_levels) > 0) {
+    if (!(sum(levels(df$Compact_Diffuse) %in% cd_levels))) {
+      stop ("Level in Compact_Diffuse that is not in training data.")
+    }
+    df$Compact_Diffuse <- factor(df$Compact_Diffuse, levels = cd_levels)
+  }
+  if (sum(levels(df$Pigment) != yn_levels) > 0) {
+    if (!(sum(levels(df$Pigment) %in% yn_levels))) {
+      stop ("Level in Pigment that is not in training data.")
+    }
+    df$Pigment <- factor(df$Pigment, levels = yn_levels)
+  }
+  if (sum(levels(df$Sticky_Debris) != yn_levels) > 0) {
+    if (!(sum(levels(df$Sticky_Debris) %in% yn_levels))) {
+     stop ("Level in Sticky_Debris that is not in training data.") 
+    }
+    df$Sticky_Debris <- factor(df$Sticky_Debris, levels = yn_levels)
+  }
+  if (sum(levels(df$Deflated) != yn_levels) > 0) {
+    if (!(sum(levels(df$Deflated) %in% yn_levels))) {
+      stop ("Level in Deflated that is not in training data.")
+    }
+    df$Deflated <- factor(df$Deflated, levels = yn_levels)
+  }
+  
+  # Return the data frame
+  return(df)
+  
+}
+```
+
+\vspace{0.5cm}
+
+Input the data frame with the predictor variables into this function to return a data frame with the correct factor levels as is done in the code below.
+
+\vspace{0.5cm}
+
+```{r}
+# Use the function to adjust the factor variable levels as needed
+example_vars_adj <- adjust_factor_levels(example_vars)
+```
+
+# Predictions
+
+Finally, the `predict` function from the `randomForest` package can be used to make predictions given one of the augmented models and the data frame with morphometric variables. All of the options in the `predict` function can be utilized. Several example are included below.
+
+\vspace{0.5cm}
+
+```{r}
+# Load the randomForest package
+library(randomForest)
+```
+
+\vspace{0.5cm}
+
+```{r}
+# Predict the species
+predict(rf_species, example_vars_adj)
+```
+
+\vspace{0.5cm}
+
+```{r}
+# Return the random forest probability associated with each species 
+# for both observations (the column ACGC contains the probabilities 
+# that the egg is an invasive carp)
+predict(rf_species, example_vars_adj, type = "prob")
+```
+
+\vspace{0.5cm}
+
+```{r}
+# Predict the species using the reduced variables model
+predict(rf_species_reduced, example_vars_adj)
+```
+
+\vspace{0.5cm}
+
+```{r}
+# Predict the genus and return the random forest probabilities 
+# for each species (again, ACGC represents the invasive carp category)
+predict(rf_genus, example_vars_adj, type = "prob")
+```
+
+\vspace{0.5cm}
+
+```{r}
+# Predict the family and return the random forest probabilities
+predict(rf_family, example_vars_adj, type = "prob")
+```
+
+
