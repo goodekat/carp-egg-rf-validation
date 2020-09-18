@@ -32,6 +32,11 @@ library(tidyr)
 
 # Create a results folder if not already created
 if (!dir.exists("../figures")) dir.create("../figures")
+
+# Specify the (base) font size (fs), font (ff), and dpi (fdpi) for all plots
+fs = 10
+ff = "Times"
+fdpi = 500
 ```
 
 # Data
@@ -180,7 +185,6 @@ eggdata141516 <- eggdata141516 %>%
   )
 ```
 
-
 \vspace{0.5cm}
 
 # Validation of Original Models
@@ -222,41 +226,41 @@ val_plot_data <-
     ),
     model_class = fct_recode(
       model_class,
-      "Bighead Carp" = "Bighead Carp:Common_Name",
-      "Grass Carp" = "Grass Carp:Common_Name",
-      "Silver Carp" = "Silver Carp:Common_Name",
-      "Ctenopharyngodon" = "Ctenopharyngodon:Genus",
-      "Hypophthalmichthys" = "Hypophthalmichthys:Genus",
-      "Invasive Carp" = "ACGC:Common_Name_ACGC",
-      "Invasive Carp \n(Reduced Variables)" =
+      "Bighead \nCarp" = "Bighead Carp:Common_Name",
+      "Grass \nCarp" = "Grass Carp:Common_Name",
+      "Silver \nCarp" = "Silver Carp:Common_Name",
+      "Ctenoph-\naryngodon" = "Ctenopharyngodon:Genus",
+      "Hypophth-\nalmichthys" = "Hypophthalmichthys:Genus",
+      "Invasive \nCarp" = "ACGC:Common_Name_ACGC",
+      "Invasive \nCarp \n(reduced \nvariables)" =
         "ACGC:Common_Name_ACGC_reduced",
-      "Invasive Carp" = "ACGC:Genus_ACGC",
-      "Invasive Carp" = "ACGC:Family_ACGC"
+      "Invasive \nCarp" = "ACGC:Genus_ACGC",
+      "Invasive \nCarp" = "ACGC:Family_ACGC"
     ),
     metric = fct_recode(
       metric,
-      "Predictive Accuracy" = "pa",
-      "False Positive Error" = "fpr",
+      "Predictive accuracy" = "pa",
+      "False positive error" = "fpr",
       "Precision" = "prec"
     )
   ) %>%
   mutate(
     metric = fct_relevel(
       metric,
-      "Predictive Accuracy",
-      "False Positive Error",
+      "Predictive accuracy",
+      "False positive error",
       "Precision",
     ),
     taxa = fct_relevel(taxa, "Species", "Genus", "Family"),
     model_class = fct_relevel(
       model_class,
-      "Bighead Carp",
-      "Grass Carp",
-      "Silver Carp",
-      "Ctenopharyngodon",
-      "Hypophthalmichthys",
-      "Invasive Carp",
-      "Invasive Carp \n(Reduced Variables)"    
+      "Bighead \nCarp",
+      "Grass \nCarp",
+      "Silver \nCarp",
+      "Ctenoph-\naryngodon",
+      "Hypophth-\nalmichthys",
+      "Invasive \nCarp",
+      "Invasive \nCarp \n(reduced \nvariables)"    
     ),
     model_type = 
       fct_relevel(
@@ -269,7 +273,7 @@ val_plot_data <-
 
 \vspace{0.5cm}
 
-```{r fig.width = 14, fig.height = 7, warning = FALSE}
+```{r fig.width = 6.5, fig.height = 4.5, warning = FALSE}
 # Create plot of validation metrics faceted by metric and taxonomic levels
 val_metric_plot <- 
   ggplot(val_plot_data,
@@ -278,13 +282,13 @@ val_metric_plot <-
          y = value * 100,
          group = taxa
        )) +
-  geom_point(size = 2) +
-  geom_line(size = 0.25) +
+  geom_point(size = 1) +
+  geom_line(size = 0.3) +
   geom_text(
     aes(label = paste0(round(value * 100, 0), "%")),
-    nudge_y = 7,
-    family = "Times",
-    size = 4
+    nudge_y = 12,
+    family = ff,
+    size = 2.5
   ) +
   facet_grid(
     metric ~ taxa,
@@ -292,7 +296,7 @@ val_metric_plot <-
     scales = "free",
     space = "free_x"
   ) +
-  theme_bw(base_size = 14, base_family = "Times") +
+  theme_bw(base_size = fs, base_family = ff) +
   theme(
     strip.placement = "outside",
     strip.background = element_rect(color = "white", fill = "white"),
@@ -300,9 +304,9 @@ val_metric_plot <-
     panel.grid.minor = element_blank()
   ) +
   labs(
-    x = "Model Response Variable (Taxonomic Level; Top Labels) and Classification Category (Bottom Labels)",
-    y = "Performance Metrics from Original Models Computed on Validation Data",
-    color = "Taxonomic Level"
+    x = "Model response variable (taxonomic level; top labels) and \nclassification category (bottom labels)",
+    y = "Performance metrics from original models \ncomputed on validation data",
+    color = "Taxonomic level"
   ) + 
   scale_y_continuous(breaks = seq(0, 100, 25), limits = c(-10, 110))
 
@@ -313,8 +317,9 @@ val_metric_plot
 ggsave(
   filename = "../figures/figure03.png",
   plot = val_metric_plot,
-  height = 7,
-  width = 14
+  height = 4.25,
+  width = 6.5,
+  dpi = fdpi
 )
 ```
 
@@ -355,19 +360,19 @@ plot_confus <- function(obs, pred) {
       label = n
     )) +
     geom_tile() +
-    geom_text(alpha = 1, family = "Times") +
-    theme_bw(base_size = 12, base_family = "Times") +
+    geom_text(alpha = 1, family = ff, size = 2.5) +
+    theme_bw(base_size = fs, base_family = ff) +
     scale_fill_gradient(
       low = "grey95",
-      high = "grey35",
+      high = "grey50",
       limits = c(1, 310),
       na.value = 'white'
     ) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           aspect.ratio = 1) +
-    labs(x = "Random Forest Prediction",
-         y = "Observed Genetic Identification",
-         fill = "Number of Eggs")  
+    labs(x = "Random forest prediction",
+         y = "Observed genetic identification",
+         fill = "Number of eggs")  
   
 }
 ```
@@ -378,7 +383,7 @@ The code below applies the function `plot_confus` to create a visualization cont
 
 \vspace{0.5cm}
 
-```{r fig.height = 16, fig.width = 14}
+```{r fig.height = 9, fig.width = 6.5}
 # Extract the observed values 
 obs2016 <- eggdata16 %>% select(all_of(vars_resp))
 
@@ -396,23 +401,25 @@ confus_matrix_grid <-
       pred = pred2016$Common_Name_ACGC
     ) +
       theme(legend.position = "none") +
-      labs(title = "Species (IC Grouped)"),
+      labs(title = "Species (IC grouped)"),
     plot_confus(obs = obs2016$Genus_ACGC, pred = pred2016$Genus_ACGC) +
       theme(legend.position = "none") +
-      labs(title = "Genus (IC Grouped)"),
+      labs(title = "Genus (IC grouped)"),
     plot_confus(
       obs = obs2016$Common_Name_ACGC,
       pred = pred2016$Common_Name_ACGC_reduced
     ) +
-      theme(legend.position = "none") +
-      labs(title = "Species (IC Grouped, Reduced Variables)"),
+      theme(legend.position = "none",
+            plot.title = element_text(hjust = 0.75)) +
+      labs(title = "Species (IC grouped, reduced variables)"),
     plot_confus(obs = obs2016$Family_ACGC, pred = pred2016$Family_ACGC) +
       theme(legend.position = "none") +
-      labs(title = "Family (IC Grouped)"),
+      labs(title = "Family (IC grouped)"),
     align = "v",
     ncol = 2,
     labels = c('(A)', '(B)', '(C)', '(D)', '(E)', '(F)'),
-    label_fontfamily = "Times"
+    label_fontfamily = ff,
+    label_size = fs
   ) %>%
   plot_grid(
     get_legend(
@@ -431,8 +438,9 @@ confus_matrix_grid
 ggsave(
   filename = "../figures/figure04.png",
   plot = confus_matrix_grid,
-  height = 16,
-  width = 14
+  height = 8.75,
+  width = 6.5, 
+  dpi = fdpi
 )
 ```
 
@@ -457,31 +465,31 @@ val_compare_plot_data <-
       "Family" = "Family_ACGC",
       "Genus" = "Genus_ACGC",
       "Species" = "Common_Name_ACGC",
-      "Species (Reduced Variables)" = "Common_Name_ACGC_reduced"
+      "Species \n(reduced variables)" = "Common_Name_ACGC_reduced"
     ),
     metric = fct_recode(
       metric,
-      "Predictive Accuracy" = "pa",
-      "False Positive Error" = "fpr",
+      "Predictive accuracy" = "pa",
+      "False positive error" = "fpr",
       "Precision" = "prec"
     ),
     site_type = fct_recode(
       site_type,
       "Added in 2016" = "new",
-      "Sampled Previous to 2016" = "old"
+      "Sampled previous to 2016" = "old"
     )
   ) %>%
   mutate(
     metric = fct_relevel(
       metric,
-      "Predictive Accuracy",
-      "False Positive Error",
+      "Predictive accuracy",
+      "False positive error",
       "Precision",
     ),
     model = fct_relevel(
       model,
       "Species",
-      "Species (Reduced Variables)",
+      "Species \n(reduced variables)",
       "Family",
       "Genus"
     )
@@ -494,7 +502,7 @@ A plot comparing the validation metrics between the old and new sites is created
 
 \vspace{0.5cm}
 
-```{r fig.width = 8, fig.height = 7, out.width = "75%", fig.align = "center"}
+```{r fig.width = 6.5, fig.height = 6.5, out.width = "75%", fig.align = "center"}
 # Create the plot
 val_metric_compare_plot <- 
   ggplot(val_compare_plot_data, aes(
@@ -504,14 +512,14 @@ val_metric_compare_plot <-
          linetype = site_type, 
          color = site_type
        )) +
-  geom_point(size = 2) +
-  geom_line(size = 0.25) +
+  geom_point(size = 1) +
+  geom_line(size = 0.3) +
   geom_text(
-    data = val_compare_plot_data  %>% filter(site_type == "Sampled Previous to 2016"),
+    data = val_compare_plot_data  %>% filter(site_type == "Sampled previous to 2016"),
     aes(label = paste0(round(value * 100, 0), "%")),
     nudge_y = 10,
     show.legend = FALSE,
-    family = "Times",
+    family = ff,
     size = 4
   ) +
   geom_text(
@@ -519,7 +527,7 @@ val_metric_compare_plot <-
     aes(label = paste0(round(value * 100, 0), "%")),
     nudge_y = -10,
     show.legend = FALSE,
-    family = "Times",
+    family = ff,
     size = 4
   ) +
   facet_grid(
@@ -528,24 +536,25 @@ val_metric_compare_plot <-
     scales = "free",
     space = "free_x"
   ) +
-  theme_bw(base_size = 14, base_family = "Times") +
+  theme_bw(base_size = fs*1.5, base_family = ff) +
   theme(
     strip.placement = "outside",
     strip.background = element_rect(color = "white", fill = "white"),
-    legend.position = c(0.15, 0.078),
+    legend.position = c(.78, 0.55),
     legend.background = element_rect(linetype = "solid", color = "black", size = 0.2),
-    legend.text = element_text(size = 10),
-    legend.title = element_text(size = 12),
+    legend.text = element_text(size = (fs*1.5)-4),
+    legend.title = element_text(size = (fs*1.5)-2),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
   ) +
   labs(
-    x = "Taxonomic Level of Invasive Carp Classification",
-    y = "Performance Metrics from Original Models Computed on Validation Data",
-    color = "Sampling Locations",
-    linetype = "Sampling Locations"
+    x = "Taxonomic level of invasive carp classification",
+    y = "Performance metrics from original models \ncomputed on validation data",
+    color = "Sampling locations",
+    linetype = "Sampling locations"
   ) + 
-  scale_color_manual(values = c("black", "grey50")) +
+  scale_color_manual(values = c("black", "grey40")) +
+  scale_linetype_manual(values = c("solid", "longdash")) +
   scale_y_continuous(breaks = seq(0, 100, 25), limits = c(-10, 110)) + 
   guides(linetype = guide_legend(ncol = 2))
 
@@ -556,8 +565,9 @@ val_metric_compare_plot
 ggsave(
   filename = "../figures/figure05.png",
   plot = val_metric_compare_plot,
-  height = 7,
-  width = 8
+  height = 5.5,
+  width = 6.5, 
+  dpi = fdpi
 )
 ```
 
@@ -621,20 +631,20 @@ perf_plot_data <-
     ),
     model_class = fct_recode(
       model_class,
-      "Bighead Carp" = "Bighead Carp:Common_Name",
-      "Grass Carp" = "Grass Carp:Common_Name",
-      "Silver Carp" = "Silver Carp:Common_Name",
-      "Ctenopharyngodon" = "Ctenopharyngodon:Genus",
-      "Hypophthalmichthys" = "Hypophthalmichthys:Genus",
-      "Invasive Carp" = "ACGC:Common_Name_ACGC",
-      "Invasive Carp \n(Reduced Variables)" = "ACGC:Common_Name_ACGC_reduced",
-      "Invasive Carp" = "ACGC:Genus_ACGC",
-      "Invasive Carp" = "ACGC:Family_ACGC"
+      "Bighead \nCarp" = "Bighead Carp:Common_Name",
+      "Grass \nCarp" = "Grass Carp:Common_Name",
+      "Silver \nCarp" = "Silver Carp:Common_Name",
+      "Ctenoph-\naryngodon" = "Ctenopharyngodon:Genus",
+      "Hypophth-\nalmichthys" = "Hypophthalmichthys:Genus",
+      "Invasive \nCarp" = "ACGC:Common_Name_ACGC",
+      "Invasive \nCarp \n(Reduced \nVariables)" = "ACGC:Common_Name_ACGC_reduced",
+      "Invasive \nCarp" = "ACGC:Genus_ACGC",
+      "Invasive \nCarp" = "ACGC:Family_ACGC"
     ),
     metric = fct_recode(
       metric,
-      "Predictive Accuracy" = "pa",
-      "False Positive Error" = "fpr",
+      "Predictive accuracy" = "pa",
+      "False positive error" = "fpr",
       "Precision" = "prec"
     ), 
     years = fct_recode(
@@ -646,20 +656,20 @@ perf_plot_data <-
   mutate(
     metric = fct_relevel(
       metric,
-      "Predictive Accuracy",
-      "False Positive Error",
+      "Predictive accuracy",
+      "False positive error",
       "Precision",
     ),
     taxa = fct_relevel(taxa, "Species", "Genus", "Family"),
     model_class = fct_relevel(
       model_class,
-      "Bighead Carp",
-      "Grass Carp",
-      "Silver Carp",
-      "Ctenopharyngodon",
-      "Hypophthalmichthys",
-      "Invasive Carp",
-      "Invasive Carp \n(Reduced Variables)"
+      "Bighead \nCarp",
+      "Grass \nCarp",
+      "Silver \nCarp",
+      "Ctenoph-\naryngodon",
+      "Hypophth-\nalmichthys",
+      "Invasive \nCarp",
+      "Invasive \nCarp \n(Reduced \nVariables)"
     ),
     model_type = 
       fct_relevel(
@@ -681,7 +691,7 @@ The visualization comparing the 2014-2015 and 2014-2016 model performance metric
 
 \vspace{0.5cm}
 
-```{r fig.width = 14, fig.height = 7}
+```{r fig.width = 6.5, fig.height = 4.5}
 perf_metric_plot <- 
   ggplot(perf_plot_data, aes(
     x = model_class,
@@ -690,47 +700,48 @@ perf_metric_plot <-
     color = years,
     linetype = years
   )) +
-  geom_point(size = 2) +
-  geom_line(size = 0.25) +
+  geom_point(size = 1) +
+  geom_line(size = 0.3) +
   geom_text(
     data = perf_plot_data %>% filter(years == "2014-2015"),
     aes(label = paste0(round(value, 0), "%")),
     nudge_y = 10,
     show.legend = FALSE,
-    family = "Times",
-    size = 4
+    family = ff,
+    size = 2.5
   ) +
   geom_text(
     data = perf_plot_data %>% filter(years == "2014-2016"),
     aes(label = paste0(round(value, 0), "%")),
     nudge_y = -10,
     show.legend = FALSE,
-    family = "Times",
-    size = 4
+    family = ff,
+    size = 2.5
   ) +
   facet_grid(metric ~ taxa,
     switch = "y",
     scales = "free",
     space = "free_x"
   ) +
-  theme_bw(base_size = 14, base_family = "Times") +
+  theme_bw(base_size = fs, base_family = ff) +
   theme(
     strip.placement = "outside",
     strip.background = element_rect(color = "white", fill = "white"),
-    legend.position = c(0.456, 0.089),
+    legend.position = c(0.09, 0.54),
     legend.background = element_rect(linetype = "solid", color = "black", size = 0.2),
-    legend.text = element_text(size = 10),
-    legend.title = element_text(size = 12),
+    legend.text = element_text(size = fs-4),
+    legend.title = element_text(size = fs-4),
     legend.box = "horizontal",
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
   ) +
   scale_color_manual(values = c("black", "grey50")) +
+  scale_linetype_manual(values = c("solid", "longdash")) +
   labs(
-    x = "Model Response Variable (Taxonomic Level; Top Labels) and Classification Category (Bottom Labels)",
-    y = "Performance Metrics Computed on Respective Training Data",
-    color = "Years Included in Model",
-    linetype = "Years Included in Model"
+    x = "Model response variable (taxonomic level; top labels) and \nclassification category (bottom labels)",
+    y = "Performance metrics computed on respective training data",
+    color = "Years included in model",
+    linetype = "Years included in model"
   ) + 
   scale_y_continuous(breaks = seq(0, 100, 25), limits = c(-10, 110))
   
@@ -741,8 +752,9 @@ perf_metric_plot
 ggsave(
   filename = "../figures/figure06.png",
   plot = perf_metric_plot,
-  height = 7,
-  width = 14
+  height = 4.5,
+  width = 6.5,
+  dpi = fdpi
 )
 ```
 
@@ -798,43 +810,50 @@ vi_plot_data <-
   mutate_at(
     .vars = vars(model, variable),
     .funs = function(.)
-      str_replace_all(., "_", " ") %>% str_replace("ACGC", "(Invasive Carp Grouped)")
+      str_replace_all(., "_", " ") %>% str_replace("ACGC", "(invasive carp grouped)")
   ) %>%
   mutate(model = factor(model)) %>%
   mutate(
     model = fct_relevel(
       model,
       "Common Name",
-      "Common Name (Invasive Carp Grouped)",
-      "Common Name (Invasive Carp Grouped) reduced",
+      "Common Name (invasive carp grouped)",
+      "Common Name (invasive carp grouped) reduced",
       "Genus",
-      "Genus (Invasive Carp Grouped)",
-      "Family (Invasive Carp Grouped)"
+      "Genus (invasive carp grouped)",
+      "Family (invasive carp grouped)"
     )
   ) %>%
   mutate(
     model = fct_recode(
       model,
       "Species" = "Common Name",
-      "Species (Invasive Carp Grouped)" = "Common Name (Invasive Carp Grouped)",
-      "Species (Invasive Carp Grouped, Reduced Variables)" =
-        "Common Name (Invasive Carp Grouped) reduced"
+      "Species (invasive carp grouped)" = "Common Name (invasive carp grouped)",
+      "Species (invasive carp grouped, \nreduced variables)" =
+        "Common Name (invasive carp grouped) reduced", 
+      "Genus (invasive carp grouped)" = "Genus (invasive carp grouped)",
+      "Family (invasive carp grouped)" = "Family (invasive carp grouped)"
     )
   ) %>%
   mutate(
     variable = fct_recode(
       factor(variable),
-      "Pigment Presence" = "Pigment",
-      "Deflated Membrane" = "Deflated",
-      "Embryo Average (mm)" = "Yolk Ave",
-      "Embryo Standard Deviation (mm)" = "Yolk SD",
-      "Embryo Coefficient of Variation" = "Yolk CV",
-      "Membrane Average (mm)" = "Membrane Ave",
-      "Membrane Standard Deviation (mm)" = "Membrane SD",
-      "Membrane Coefficient of Variation" = "Membrane CV",
-      "Perivitelline Space Index" = "Yolk to Membrane Ratio", 
-      "Water Temperature (C)" = "Temperature",
-      "Conductivity (\U00B5S/cm)" = "Conductivity"
+      "Pigment presence" = "Pigment",
+      "Deflated membrane" = "Deflated",
+      "Embryo average (mm)" = "Yolk Ave",
+      "Embryo standard deviation (mm)" = "Yolk SD",
+      "Embryo coefficient of variation" = "Yolk CV",
+      "Membrane average (mm)" = "Membrane Ave",
+      "Membrane standard deviation (mm)" = "Membrane SD",
+      "Membrane coefficient of variation" = "Membrane CV",
+      "Perivitelline space index" = "Yolk to Membrane Ratio", 
+      "Water temperature (C)" = "Temperature",
+      "Conductivity (\U00B5S/cm)" = "Conductivity",
+      "Sticky debris" = "Sticky Debris", 
+      "Julian day" = "Julian Day",
+      "Egg stage" = "Egg Stage",
+      "Larval length" = "Larval Length",
+      "Compact diffuse" = "Compact Diffuse"
     )
   )
 
@@ -863,25 +882,26 @@ vi_plot <-
     group = year,
     linetype = year
   )) +
-  geom_point() +
-  geom_line() +
+  geom_point(size = 1.5) +
+  geom_line(size = 0.3) +
   facet_wrap(. ~ model, ncol = 3) +
   scale_color_manual(values = c("black", "grey50")) +
-  theme_bw(base_size = 16, base_family = "Times") +
+  scale_linetype_manual(values = c("solid", "dashed")) +
+  theme_bw(base_size = fs, base_family = ff) +
   theme(
     strip.background = element_rect(color = "white", fill = "white"),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    legend.position = c(0.075, 0.082),
+    legend.position = c(0.065, 0.105),
     legend.background = element_rect(linetype = "solid", color = "black", size = 0.2),
-    legend.text = element_text(size = 10),
-    legend.title = element_text(size = 12)
+    legend.text = element_text(size = fs-4),
+    legend.title = element_text(size = fs-4),
+    axis.title.y = element_blank()
   ) +
   labs(
-    y = "Predictor Variables \n(Ordered by average variable importance rank of original models)", 
-    x = "Variable Importance Rank",
-    color = "Years Included in Model",
-    linetype = "Years Included in Model"
+    x = "Variable importance rank",
+    color = "Years included \nin model",
+    linetype = "Years included \nin model"
   )
 
 # Print the figure
@@ -891,8 +911,9 @@ vi_plot
 ggsave(
   filename = "../figures/figure07.png",
   plot = vi_plot,
-  height = 8,
-  width = 18
+  height = 5,
+  width = 8.5,
+  dpi = fdpi
 )
 ```
 
@@ -1006,17 +1027,17 @@ create_pd_plot <- function(var, include_1415 = FALSE) {
   var_clean <- data.frame(
     name = vars_pred_reduced,
     name_clean = c(
-      "Membrane Average (mm)",
-      "Embryo Average (mm)",
-      "Deflated Membrane",
-      "Membrane Standard Deviation (mm)",
-      "Water Temperature (C)",
-      "Pigment Presence",
-      "Julian Day",
-      "Perivitelline Space Index",
-      "Membrane Coefficient of Variation",
+      "Membrane average (mm)",
+      "Embryo average (mm)",
+      "Deflated membrane",
+      "Membrane standard deviation (mm)",
+      "Water temperature (C)",
+      "Pigment presence",
+      "Julian day",
+      "Perivitelline space index",
+      "Membrane coefficient of variation",
       "Conductivity (\U00B5S/cm)",
-      "Embryo Standard Deviation (mm)"
+      "Embryo standard deviation (mm)"
     )
   ) %>%
     filter(name == var) %>%
@@ -1070,7 +1091,7 @@ create_pd_plot <- function(var, include_1415 = FALSE) {
                   x = value,
                   y = mean,
                   group = variable,
-                  color = "Original Model"
+                  color = "Original model"
                 )) + 
       scale_color_manual(values = "grey50")
     } else {
@@ -1080,9 +1101,9 @@ create_pd_plot <- function(var, include_1415 = FALSE) {
                   x = value,
                   y = mean,
                   group = variable,
-                  linetype = "Original Model"
+                  linetype = "Original model"
                 ), color = "grey50") + 
-      scale_linetype_manual(values = "dashed") 
+      scale_linetype_manual(values = "longdash") 
     }
   }
   
@@ -1114,7 +1135,7 @@ create_pd_plot <- function(var, include_1415 = FALSE) {
   pd_plot <- pd_plot +
     facet_wrap(. ~ variable, scales = "free_x", strip.position = "bottom") +
     ylim(-0.1, 1.05) +
-    theme_bw(base_size = 12, base_family = "Times") +
+    theme_bw(base_size = fs*1.5, base_family = ff) +
     theme(
       strip.background = element_rect(color = "white", fill = "white"),
       strip.placement = "outside",
@@ -1123,16 +1144,16 @@ create_pd_plot <- function(var, include_1415 = FALSE) {
         color = "black",
         size = 0.2
       ),
-      legend.text = element_text(size = 10),
-      legend.title = element_text(size = 12),
+      legend.text = element_text(size = (fs*1.5)-2),
+      legend.title = element_text(size = fs*1.5),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank()
     )
   
   # Finish plot by adding labels
   if (var == "Deflated") {
-    pd_plot + labs(x = "", y = "Probability of Invasive Carp") + 
-      theme(axis.title = element_text(size = 10))
+    pd_plot + labs(x = "", y = "Probability of invasive carp") +
+      theme(axis.title = element_text(size = fs*1.5))
   } else {
     pd_plot + labs(x = "", y = "")
   }
@@ -1165,7 +1186,7 @@ pd_plots <-
 pd_plot_legend <-
   get_legend(
     perf_metric_plot +
-      theme_bw(base_size = 12, base_family = "Times") + theme(
+      theme_bw(base_size = 12, base_family = ff) + theme(
         legend.position = "right",
         legend.background = element_rect(
           linetype = "solid",
@@ -1182,8 +1203,8 @@ pd_plot <-
   plot_grid(
     plotlist = c(pd_plots, pd_plot_legend),
     labels = c('(A)', '(B)', '(C)', '(D)', '(E)', '(F)', '(G)', '(H)', '(I)', '(J)', '(K)'),
-    label_fontfamily = "Times", 
-    label_size = 10
+    label_fontfamily = ff, 
+    label_size = fs*1.5, label_x = 0.25, label_y = 0.95
   )
 
 # Print the figure
@@ -1194,7 +1215,7 @@ ggsave(
   filename = "../figures/figure08.png",
   plot = pd_plot,
   height = 8,
-  width = 12
+  width = 13
 )
 ```
 
@@ -1260,7 +1281,7 @@ A heatmap of the correlations is printed below.
 
 \vspace{0.5cm}
 
-```{r fig.height = 8, fig.width = 8}
+```{r fig.height = 6.5, fig.width = 6.5}
 # Plot the correlations
 cor_heatmap <-
   cor_red_vars %>%
@@ -1272,31 +1293,31 @@ cor_heatmap <-
     .funs = function(.) {
       fct_recode(
         .,
-        "Membrane Average (mm)" = "Membrane_Ave",
-        "Embryo Average (mm)" = "Yolk_Ave",
-        "Membrane Standard Deviation (mm)" = "Membrane_SD",
-        "Water Temperature (C)" = "Temperature",
-        "Julian Day" = "Julian_Day",
-        "Perivitelline Space Index" = "Yolk_to_Membrane_Ratio",
-        "Membrane Coefficient of Variation" = "Membrane_CV",
+        "Membrane average (mm)" = "Membrane_Ave",
+        "Embryo average (mm)" = "Yolk_Ave",
+        "Membrane standard deviation (mm)" = "Membrane_SD",
+        "Water temperature (C)" = "Temperature",
+        "Julian day" = "Julian_Day",
+        "Perivitelline space dndex" = "Yolk_to_Membrane_Ratio",
+        "Membrane coefficient of variation" = "Membrane_CV",
         "Conductivity (\U00B5S/cm)" = "Conductivity",
-        "Embryo Standard Deviation (mm)" = "Yolk_SD"
+        "Embryo standard deviation (mm)" = "Yolk_SD"
       )
     }
   ) %>%
   ggplot(aes(x = vars_cols, y = vars_rows, fill = abs(cor))) +
   geom_tile() +
-  geom_text(aes(label = cor), family = "Times") +
-  scale_fill_gradient(low = "white", high = "grey30", limits = c(0, 1)
+  geom_text(aes(label = cor), family = ff) +
+  scale_fill_gradient(low = "white", high = "grey50", limits = c(0, 1)
   ) +
-  theme_bw(base_size = 12, base_family = "Times") +
+  theme_bw(base_size = fs, base_family = ff) +
   scale_x_discrete(position = "top") +
   theme(
     panel.grid = element_blank(),
     aspect.ratio = 1,
     axis.text.x = element_text(angle = 45, hjust = 0)
   ) +
-  labs(x = "", y = "", fill = "Magnitude of \nPearson \nCorrelation")
+  labs(x = "", y = "", fill = "Pearson \ncorrelation \nmagnitude")
 
 # Print the figure
 cor_heatmap
@@ -1305,8 +1326,9 @@ cor_heatmap
 ggsave(
   filename = "../figures/figure09.png",
   plot = cor_heatmap,
-  height = 8,
-  width = 8
+  height = 6.5,
+  width = 6.5,
+  dpi = fdpi
 )
 ```
 
