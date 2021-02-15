@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 \vspace{0.5cm}
 
-This document contains the R code used to create figures for the paper "Evaluation of a Random Forest Model to Identify Invasive Carp Eggs Based on Morphometric Features". The computer platform, R version, and R package versions used to perform this analysis can be found at the end of the document.
+This document contains the R code used to create figures for the paper "Evaluation of a Random Forest Model to Identify Invasive Carp Eggs Based on Morphometric Features". The computer platform, R version, and R package versions used to perform this analysis can be found at the end of the document. The R markdown document that generated this document and the saved versions of the figures from this document are available at https://github.com/goodekat/carp-egg-rf-validation.
 
 \vspace{0.5cm}
 

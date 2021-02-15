@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \vspace{0.5cm}
 
-This document accompanies the paper "Evaluation of a Random Forest Model to Identify Invasive Carp Eggs Based on Morphometric Features". It contains code for accessing the augmented models with invasive carp treated as one species. Users can use the function `carp_rf_predict` to input a set of their own morphometric variable values to obtain predictions from the models.
+This document accompanies the paper "Evaluation of a Random Forest Model to Identify Invasive Carp Eggs Based on Morphometric Features". It contains code for accessing the augmented models with invasive carp treated as one species. Users can use the function `carp_rf_predict` to input a set of their own morphometric variable values to obtain predictions from the models. The R markdown document that generated this document and the random forest models are available at https://github.com/goodekat/carp-egg-rf-validation.
 
 \vspace{0.5cm}
 
