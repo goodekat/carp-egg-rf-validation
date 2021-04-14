@@ -47,9 +47,9 @@ The data that will be used in this document is loaded below.
 
 ```{r}
 # Load the egg measurement datasets
-eggdata16 <- read.csv("../results/eggdata16.csv")
-eggdata1415 <- read.csv("../results/eggdata1415.csv")
-eggdata141516 <- read.csv("../results/eggdata141516.csv")
+eggdata16 <- read.csv("../data/eggdata16.csv")
+eggdata1415 <- read.csv("../data/eggdata1415.csv")
+eggdata141516 <- read.csv("../data/eggdata141516.csv")
 
 # Load the predictions for the validation data
 pred2016 <- read.csv("../results/pred2016.csv")
@@ -93,10 +93,10 @@ vars_pred = c(
   "Membrane_Ave",
   "Membrane_SD",
   "Membrane_CV",
-  "Yolk_to_Membrane_Ratio",
-  "Yolk_Ave",
-  "Yolk_SD",
-  "Yolk_CV",
+  "Embryo_to_Membrane_Ratio",
+  "Embryo_Ave",
+  "Embryo_SD",
+  "Embryo_CV",
   "Egg_Stage",
   "Compact_Diffuse",
   "Pigment",
@@ -107,16 +107,16 @@ vars_pred = c(
 # Make a vector of the reduced predictor variables to be used in the models
 vars_pred_reduced = c(
   "Membrane_Ave",
-  "Yolk_Ave",
+  "Embryo_Ave",
   "Deflated",
   "Membrane_SD",
   "Temperature",
   "Pigment",
   "Julian_Day",
-  "Yolk_to_Membrane_Ratio",
+  "Embryo_to_Membrane_Ratio",
   "Membrane_CV",
   "Conductivity",
-  "Yolk_SD"
+  "Embryo_SD"
 )
 ```
 
@@ -131,18 +131,33 @@ The code below makes sure the data has the same structure as when the models wer
 eggdata16 <- eggdata16 %>%
   mutate(Dataset = as.character(Dataset)) %>%
   mutate_at(
-    .vars = c("Site", "River", "Egg_Stage", "Compact_Diffuse", 
-              "Pigment", "Sticky_Debris", "Deflated", all_of(vars_resp)),
+    .vars = c(
+      "Site",
+      "River",
+      "Egg_Stage",
+      "Compact_Diffuse",
+      "Pigment",
+      "Sticky_Debris",
+      "Deflated",
+      all_of(vars_resp)
+    ),
     .funs = factor
-  ) %>% 
+  ) %>%
+  mutate_at(.vars = c("Year", "Month", "Julian_Day"),
+            .funs = as.integer) %>%
   mutate_at(
-    .vars = c("Year", "Month", "Julian_Day"), 
-    .funs = as.integer
-  ) %>% 
-  mutate_at(
-    .vars = c("Temperature", "Conductivity", "Larval_Length", "Membrane_Ave",
-              "Membrane_SD", "Membrane_CV", "Yolk_to_Membrane_Ratio", "Yolk_Ave",
-              "Yolk_SD", "Yolk_CV"), 
+    .vars = c(
+      "Temperature",
+      "Conductivity",
+      "Larval_Length",
+      "Membrane_Ave",
+      "Membrane_SD",
+      "Membrane_CV",
+      "Embryo_to_Membrane_Ratio",
+      "Embryo_Ave",
+      "Embryo_SD",
+      "Embryo_CV"
+    ),
     .funs = as.double
   )
 
@@ -150,37 +165,67 @@ eggdata16 <- eggdata16 %>%
 eggdata1415 <- eggdata1415 %>%
   mutate(Dataset = as.character(Dataset)) %>%
   mutate_at(
-    .vars = c("Site", "River", "Egg_Stage", "Compact_Diffuse", 
-              "Pigment", "Sticky_Debris", "Deflated", all_of(vars_resp)),
+    .vars = c(
+      "Site",
+      "River",
+      "Egg_Stage",
+      "Compact_Diffuse",
+      "Pigment",
+      "Sticky_Debris",
+      "Deflated",
+      all_of(vars_resp)
+    ),
     .funs = factor
-  ) %>% 
+  ) %>%
+  mutate_at(.vars = c("Year", "Month", "Julian_Day"),
+            .funs = as.integer) %>%
   mutate_at(
-    .vars = c("Year", "Month", "Julian_Day"), 
-    .funs = as.integer
-  ) %>% 
-  mutate_at(
-    .vars = c("Temperature", "Conductivity", "Larval_Length", "Membrane_Ave",
-              "Membrane_SD", "Membrane_CV", "Yolk_to_Membrane_Ratio", "Yolk_Ave",
-              "Yolk_SD", "Yolk_CV"), 
+    .vars = c(
+      "Temperature",
+      "Conductivity",
+      "Larval_Length",
+      "Membrane_Ave",
+      "Membrane_SD",
+      "Membrane_CV",
+      "Embryo_to_Membrane_Ratio",
+      "Embryo_Ave",
+      "Embryo_SD",
+      "Embryo_CV"
+    ),
     .funs = as.double
   )
-  
+
 # Specify variable types for 2014-2016 data
 eggdata141516 <- eggdata141516 %>%
   mutate(Dataset = as.character(Dataset)) %>%
   mutate_at(
-    .vars = c("Site", "River", "Egg_Stage", "Compact_Diffuse", 
-              "Pigment", "Sticky_Debris", "Deflated", all_of(vars_resp)),
+    .vars = c(
+      "Site",
+      "River",
+      "Egg_Stage",
+      "Compact_Diffuse",
+      "Pigment",
+      "Sticky_Debris",
+      "Deflated",
+      all_of(vars_resp)
+    ),
     .funs = factor
-  ) %>% 
+  ) %>%
+  mutate_at(.vars = c("Year", "Month", "Julian_Day"),
+            .funs = as.integer) %>%
   mutate_at(
-    .vars = c("Year", "Month", "Julian_Day"), 
-    .funs = as.integer
-  ) %>% 
-  mutate_at(
-    .vars = c("Temperature", "Conductivity", "Larval_Length", "Membrane_Ave",
-              "Membrane_SD", "Membrane_CV", "Yolk_to_Membrane_Ratio", "Yolk_Ave",
-              "Yolk_SD", "Yolk_CV"), 
+    .vars = c(
+      "Temperature",
+      "Conductivity",
+      "Larval_Length",
+      "Membrane_Ave",
+      "Membrane_SD",
+      "Membrane_CV",
+      "Embryo_to_Membrane_Ratio",
+      "Embryo_Ave",
+      "Embryo_SD",
+      "Embryo_CV"
+    ),
     .funs = as.double
   )
 ```
@@ -454,11 +499,20 @@ The code below prepares the validation metrics separated by old and new sites fo
 
 ```{r}
 # Prepare the data for the plot
-val_compare_plot_data <- 
+val_compare_plot_data <-
   val_metrics_separate %>%
-  pivot_longer(names_to = "metric", values_to = "value", cols = pa:prec) %>%
-  filter(model %in% 
-           c("Genus_ACGC", "Family_ACGC", "Common_Name_ACGC", "Common_Name_ACGC_reduced")) %>%
+  pivot_longer(names_to = "metric",
+               values_to = "value",
+               cols = pa:prec) %>%
+  filter(
+    model %in%
+      c(
+        "Genus_ACGC",
+        "Family_ACGC",
+        "Common_Name_ACGC",
+        "Common_Name_ACGC_reduced"
+      )
+  ) %>%
   mutate(
     model = fct_recode(
       model,
@@ -830,7 +884,7 @@ vi_plot_data <-
       "Species" = "Common Name",
       "Species (invasive carp grouped)" = "Common Name (invasive carp grouped)",
       "Species (invasive carp grouped, \nreduced variables)" =
-        "Common Name (invasive carp grouped) reduced", 
+        "Common Name (invasive carp grouped) reduced",
       "Genus (invasive carp grouped)" = "Genus (invasive carp grouped)",
       "Family (invasive carp grouped)" = "Family (invasive carp grouped)"
     )
@@ -840,16 +894,16 @@ vi_plot_data <-
       factor(variable),
       "Pigment presence" = "Pigment",
       "Deflated membrane" = "Deflated",
-      "Embryo average (mm)" = "Yolk Ave",
-      "Embryo standard deviation (mm)" = "Yolk SD",
-      "Embryo coefficient of variation" = "Yolk CV",
+      "Embryo average (mm)" = "Embryo Ave",
+      "Embryo standard deviation (mm)" = "Embryo SD",
+      "Embryo coefficient of variation" = "Embryo CV",
       "Membrane average (mm)" = "Membrane Ave",
       "Membrane standard deviation (mm)" = "Membrane SD",
       "Membrane coefficient of variation" = "Membrane CV",
-      "Perivitelline space index" = "Yolk to Membrane Ratio", 
+      "Embryo to Membrane Ratio" = "Embryo to Membrane Ratio",
       "Water temperature (C)" = "Temperature",
       "Conductivity (\U00B5S/cm)" = "Conductivity",
-      "Sticky debris" = "Sticky Debris", 
+      "Sticky debris" = "Sticky Debris",
       "Julian day" = "Julian Day",
       "Egg stage" = "Egg Stage",
       "Larval length" = "Larval Length",
@@ -858,11 +912,11 @@ vi_plot_data <-
   )
 
 vi_ave_order <-
-  vi_plot_data %>% 
+  vi_plot_data %>%
   filter(year == "2014-2015") %>%
-  group_by(variable) %>% 
-  summarise(mean_vi = mean(vi), .groups = "drop") %>% 
-  arrange(mean_vi) %>% 
+  group_by(variable) %>%
+  summarise(mean_vi = mean(vi), .groups = "drop") %>%
+  arrange(mean_vi) %>%
   pull(variable)
 ```
 
@@ -873,7 +927,7 @@ A visualization comparing the variable importance values is created in the follo
 \vspace{0.5cm}
 
 ```{r fig.height = 8, fig.width = 18}
-vi_plot <- 
+vi_plot <-
   vi_plot_data %>%
   ggplot(aes(
     y = factor(variable, levels = vi_ave_order),
@@ -893,16 +947,18 @@ vi_plot <-
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     legend.position = c(0.065, 0.105),
-    legend.background = element_rect(linetype = "solid", color = "black", size = 0.2),
-    legend.text = element_text(size = fs-4),
-    legend.title = element_text(size = fs-4),
+    legend.background = element_rect(
+      linetype = "solid",
+      color = "black",
+      size = 0.2
+    ),
+    legend.text = element_text(size = fs - 4),
+    legend.title = element_text(size = fs - 4),
     axis.title.y = element_blank()
   ) +
-  labs(
-    x = "Variable importance rank",
-    color = "Years included \nin model",
-    linetype = "Years included \nin model"
-  )
+  labs(x = "Variable importance rank",
+       color = "Years included \nin model",
+       linetype = "Years included \nin model")
 
 # Print the figure
 vi_plot
@@ -1034,7 +1090,7 @@ create_pd_plot <- function(var, include_1415 = FALSE) {
       "Water temperature (C)",
       "Pigment presence",
       "Julian day",
-      "Perivitelline space index",
+      "Embryo to Membrane Ratio",
       "Membrane coefficient of variation",
       "Conductivity (\U00B5S/cm)",
       "Embryo standard deviation (mm)"
@@ -1221,7 +1277,7 @@ ggsave(
 
 \vspace{0.5cm}
 
-The following code computes the change in average probability of classification of an invasive carp based on a specified change in average membrane diameter and average yolk diameter. 
+The following code computes the change in average probability of classification of an invasive carp based on a specified change in average membrane diameter and average embryo diameter. 
 
 \vspace{0.5cm}
 
@@ -1234,9 +1290,9 @@ pd141516 %>%
   summarise(diff = max(mean) - min(mean)) %>%
   pull(diff)
 
-# Change in yolk average
+# Change in embryo average
 pd141516 %>% 
-  filter(variable == "Yolk_Ave") %>%
+  filter(variable == "Embryo_Ave") %>%
   mutate(value = as.numeric(as.character(value))) %>%
   filter(value >= 1, value <= 2) %>%
   summarise(diff = max(mean) - min(mean)) %>%
@@ -1294,14 +1350,14 @@ cor_heatmap <-
       fct_recode(
         .,
         "Membrane average (mm)" = "Membrane_Ave",
-        "Embryo average (mm)" = "Yolk_Ave",
+        "Embryo average (mm)" = "Embryo_Ave",
         "Membrane standard deviation (mm)" = "Membrane_SD",
         "Water temperature (C)" = "Temperature",
         "Julian day" = "Julian_Day",
-        "Perivitelline space dndex" = "Yolk_to_Membrane_Ratio",
+        "Embryo_to_Membrane_Ratio" = "Embryo_to_Membrane_Ratio",
         "Membrane coefficient of variation" = "Membrane_CV",
         "Conductivity (\U00B5S/cm)" = "Conductivity",
-        "Embryo standard deviation (mm)" = "Yolk_SD"
+        "Embryo standard deviation (mm)" = "Embryo_SD"
       )
     }
   ) %>%

@@ -38,7 +38,7 @@ rf_family <- rfs141516$Family_ACGC
 
 # Structure of the Morphometric Variable Data Frame
 
-In order to be able to use one of the random forest models for prediction, the new data must contain the morphometric predictor variables listed in the table below where each column in the data frame contains the entries for one of the variables. The variable names must be the same as those listed below (case sensitive), and the variable types also must be the same. If the objective is to use the random forest `rf_species_reduced`, then only the variables of `Membrane_Ave`, `Yolk_Ave`, `Deflated`, `Membrane_SD`, `Temperature`, `Pigment`, `Julian_Day`, `Yolk_to_Membrane_Ratio`, `Membrane_CV`, `Conductivity`, and `Yolk_SD` are needed.
+In order to be able to use one of the random forest models for prediction, the new data must contain the morphometric predictor variables listed in the table below where each column in the data frame contains the entries for one of the variables. The variable names must be the same as those listed below (case sensitive), and the variable types also must be the same. If the objective is to use the random forest `rf_species_reduced`, then only the variables of `Membrane_Ave`, `Embryo_Ave`, `Deflated`, `Membrane_SD`, `Temperature`, `Pigment`, `Julian_Day`, `Embryo_to_Membrane_Ratio`, `Membrane_CV`, `Conductivity`, and `Embryo_SD` are needed.
 
 | Variable | Type | Description |
 | -------- | --- | --------------- |
@@ -49,10 +49,10 @@ In order to be able to use one of the random forest models for prediction, the n
 | `Membrane_Ave` | `num` | average membrane diameter (mm)
 | `Membrane_SD` | `num` | membrane diameter standard deviation (mm)
 | `Membrane_CV` | `num` | membrane diameter coefficient of variation (mm)
-| `Yolk_to_Membrane_Ratio` | `num` | perivitelline space index
-| `Yolk_Ave` | `num` | average embryo diameter (mm)
-| `Yolk_SD` | `num` | embryo diameter standard deviation (mm)
-| `Yolk_CV` | `num` | embryo diameter coefficient of variation (mm)
+| `Embryo_to_Membrane_Ratio` | `num` | embryo to membrane ratio
+| `Embryo_Ave` | `num` | average embryo diameter (mm)
+| `Embryo_SD` | `num` | embryo diameter standard deviation (mm)
+| `Embryo_CV` | `num` | embryo diameter coefficient of variation (mm)
 | `Egg_Stage` | `Factor` | development stage of the egg (1, 2, 3, 4, 5, 6, 7, 8, BROKEN, or D)
 | `Compact_Diffuse` | `Factor` | indicates whether the egg was compact or diffuse (C or D)
 | `Pigment` | `Factor` | indicates whether the egg had pigment or not (Y or N)
@@ -75,10 +75,10 @@ example_vars <-
     Membrane_Ave = c(1.39305, 1.31183),
     Membrane_SD = c(0.12109, 0.18596),
     Membrane_CV = c(0.08692, 0.14176),
-    Yolk_to_Membrane_Ratio = c(0.57986, 0.14176),
-    Yolk_Ave = c(0.80777, 1.06952),
-    Yolk_SD = c(0.1685, 0.1955),
-    Yolk_CV = c(0.2086, 0.1828),
+    Embryo_to_Membrane_Ratio = c(0.57986, 0.14176),
+    Embryo_Ave = c(0.80777, 1.06952),
+    Embryo_SD = c(0.1685, 0.1955),
+    Embryo_CV = c(0.2086, 0.1828),
     Egg_Stage = factor(c(1, 4)),
     Compact_Diffuse = factor(c("C", "C")),
     Pigment = factor(c("Y", "Y")),

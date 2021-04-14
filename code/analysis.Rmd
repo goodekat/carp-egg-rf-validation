@@ -65,10 +65,10 @@ vars_pred = c(
   "Membrane_Ave",
   "Membrane_SD",
   "Membrane_CV",
-  "Yolk_to_Membrane_Ratio",
-  "Yolk_Ave",
-  "Yolk_SD",
-  "Yolk_CV",
+  "Embryo_to_Membrane_Ratio",
+  "Embryo_Ave",
+  "Embryo_SD",
+  "Embryo_CV",
   "Egg_Stage",
   "Compact_Diffuse",
   "Pigment",
@@ -79,16 +79,16 @@ vars_pred = c(
 # Make a vector of the reduced predictor variables to be used in the models
 vars_pred_reduced = c(
   "Membrane_Ave",
-  "Yolk_Ave",
+  "Embryo_Ave",
   "Deflated",
   "Membrane_SD",
   "Temperature",
   "Pigment",
   "Julian_Day",
-  "Yolk_to_Membrane_Ratio",
+  "Embryo_to_Membrane_Ratio",
   "Membrane_CV",
   "Conductivity",
-  "Yolk_SD"
+  "Embryo_SD"
 )
 ```
 
@@ -121,6 +121,13 @@ eggdata_raw <- read.csv("../data/eggdata141516_raw.csv") %>%
         str_replace("Acgc", "ACGC") %>%
         str_replace("Temp", "Temperature")
     }
+  ) %>%
+  # Rename variables using yolk to embryo
+  rename(
+      "Embryo_to_Membrane_Ratio" = "Yolk_to_Membrane_Ratio",
+      "Embryo_Ave" = "Yolk_Ave",
+      "Embryo_SD" = "Yolk_SD",
+      "Embryo_CV" = "Yolk_CV",
   )
 
 # Clean the data
@@ -163,7 +170,7 @@ eggdata <-
   )
 
 # Save the cleaned data
-write.csv(eggdata, "../results/eggdata_cleaned.csv", row.names = FALSE)
+write.csv(eggdata, "../data/eggdata_cleaned.csv", row.names = FALSE)
 ```
 
 \vspace{0.5cm}
@@ -211,7 +218,7 @@ eggdata1415 <- eggdata %>%
   )
 
 # Save the data
-write.csv(eggdata1415, "../results/eggdata1415.csv", row.names = FALSE)  
+write.csv(eggdata1415, "../data/eggdata1415.csv", row.names = FALSE)  
 ```
 
 \vspace{0.5cm}
@@ -261,7 +268,7 @@ eggdata141516 <-
   )
 
 # Save the data
-write.csv(eggdata141516, "../results/eggdata141516.csv", row.names = FALSE)
+write.csv(eggdata141516, "../data/eggdata141516.csv", row.names = FALSE)
 ```
 
 \vspace{0.5cm}
@@ -310,7 +317,7 @@ The code below extracts the 2016 observations from the cleaned 2014-2016 data. T
 eggdata16 <- eggdata141516 %>% filter(Year == 2016)
 
 # Save the data
-write.csv(eggdata16, "../results/eggdata16.csv", row.names = FALSE)
+write.csv(eggdata16, "../data/eggdata16.csv", row.names = FALSE)
 ```
 
 \vspace{0.5cm}
@@ -876,7 +883,7 @@ metrics_joined %>%
 
 # Summary Statistics
 
-The following code computes the average and standard error for the variables of average membrane diameter and average yolk diameter for the species of Bighead, Grass, and Silver Carp. 
+The following code computes the average and standard error for the variables of average membrane diameter and average embryo diameter for the species of Bighead, Grass, and Silver Carp. 
 
 \vspace{0.5cm}
 
@@ -886,8 +893,8 @@ eggdata141516 %>%
   group_by(Common_Name) %>%
   summarise(mean_mem_ave = round(mean(Membrane_Ave), 1),
             se_mem_ave = round(sd(Membrane_Ave) / n(), 3),
-            mean_yolk_ave = round(mean(Yolk_Ave), 1),
-            se_yolk_ave = round(sd(Yolk_Ave) / n(), 3))
+            mean_embryo_ave = round(mean(Embryo_Ave), 1),
+            se_embryo_ave = round(sd(Embryo_Ave) / n(), 3))
 ```
 
 # Session Info
