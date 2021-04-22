@@ -36,7 +36,7 @@ if (!dir.exists("../figures")) dir.create("../figures")
 # Specify the (base) font size (fs), font (ff), and dpi (fdpi) for all plots
 fs = 10
 ff = "Times"
-fdpi = 500
+fdpi = 600
 ```
 
 # Data
@@ -900,7 +900,7 @@ vi_plot_data <-
       "Membrane average (mm)" = "Membrane Ave",
       "Membrane standard deviation (mm)" = "Membrane SD",
       "Membrane coefficient of variation" = "Membrane CV",
-      "Embryo to Membrane Ratio" = "Embryo to Membrane Ratio",
+      "Embryo to membrane ratio" = "Embryo to Membrane Ratio",
       "Water temperature (C)" = "Temperature",
       "Conductivity (\U00B5S/cm)" = "Conductivity",
       "Sticky debris" = "Sticky Debris",
@@ -1090,7 +1090,7 @@ create_pd_plot <- function(var, include_1415 = FALSE) {
       "Water temperature (C)",
       "Pigment presence",
       "Julian day",
-      "Embryo to Membrane Ratio",
+      "Embryo to membrane ratio",
       "Membrane coefficient of variation",
       "Conductivity (\U00B5S/cm)",
       "Embryo standard deviation (mm)"
@@ -1354,7 +1354,7 @@ cor_heatmap <-
         "Membrane standard deviation (mm)" = "Membrane_SD",
         "Water temperature (C)" = "Temperature",
         "Julian day" = "Julian_Day",
-        "Embryo_to_Membrane_Ratio" = "Embryo_to_Membrane_Ratio",
+        "Embryo to membrane ratio" = "Embryo_to_Membrane_Ratio",
         "Membrane coefficient of variation" = "Membrane_CV",
         "Conductivity (\U00B5S/cm)" = "Conductivity",
         "Embryo standard deviation (mm)" = "Embryo_SD"
